@@ -25,13 +25,16 @@ jobs:
         with:
           gradle-version: '8.0'
 
-      - name: Fix Android Namespace
+      - name: Fix Android Namespace and Enable AndroidX
         run: |
           # Extrai o nome do pacote do AndroidManifest
           PACKAGE_NAME=$(grep -oP 'package="\K[^"]+' app/src/main/AndroidManifest.xml)
           echo "Pacote encontrado: $PACKAGE_NAME"
           # Injeta a regra do namespace dentro do bloco 'android' no build.gradle
           sed -i "/android {/a \    namespace '$PACKAGE_NAME'" app/build.gradle
+          # Habilita o AndroidX e o Jetifier no gradle.properties
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
 
       - name: Build Release APK
         run: gradle assembleRelease
